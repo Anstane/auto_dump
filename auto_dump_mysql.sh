@@ -23,3 +23,15 @@ if [ $? -eq 0 ]; then
 else
   echo "Backup failed for database: ${DB_NAME}"
 fi
+
+# Найти и сохранить список старых дампов
+OLD_BACKUPS=$(find ${BACKUP_DIR} -type f -name "*.sql" -mtime +7)
+
+# Удаление старых дампов
+if [ -n "$OLD_BACKUPS" ]; then
+  echo "Removing old backups:"
+  echo "$OLD_BACKUPS" | tee -a /var/log/mysql_backup.log | xargs rm -f
+  echo "Old backups removed."
+else
+  echo "No old backups to remove."
+fi
